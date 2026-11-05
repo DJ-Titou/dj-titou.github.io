@@ -93,8 +93,8 @@
                     </div>
                 </div>
                 <div class="flex space-x-3">
-                    <button onclick="changeLanguage('fr') id="btn-fr" class="lang-btn active"><span class="text-xl">🇫🇷</span></button>
-                    <button onclick="changeLanguage('en')" id="btn-en" class="lang-btn"><span class="text-xl">🇬🇧</span></button>
+                    <button type="button" onclick="changeLanguage('fr')" id="btn-fr" class="lang-btn active"><span class="text-xl">🇫🇷</span></button>
+                    <button type="button" onclick="changeLanguage('en')" id="btn-en" class="lang-btn"><span class="text-xl">🇬🇧</span></button>
                 </div>
                 <input type="checkbox" id="menu-toggle" class="hidden">
                 <label for="menu-toggle" class="lg:hidden cursor-pointer text-cyan-400">
@@ -401,8 +401,8 @@
         };
 
         function changeLanguage(lang) {
-            document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
-            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-fr')?.classList.toggle('active', lang === 'fr');
+            document.getElementById('btn-en')?.classList.toggle('active', lang === 'en');
             document.querySelectorAll('[data-key]').forEach(el => {
                 const key = el.getAttribute('data-key');
                 if (translations[lang][key]) el.innerText = translations[lang][key];
