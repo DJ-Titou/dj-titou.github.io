@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ Titou - Site Officiel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#020617',
+                        'accent': '#06b6d4',
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&display=swap');
+        
+        .inner-page-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 50% -20%, #083344 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, #1e1b4b 0%, transparent 40%);
+            opacity: 0; transition: opacity 0.8s ease;
+        }
+        .bg-visible { opacity: 1; }
+        .page-content { display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .page-active { display: block; opacity: 1; transform: translateY(0); min-height: 100vh; }
+        .page-exit { opacity: 0 !important; transform: translateY(-10px) !important; }
+        .neon-text { text-shadow: 0 0 10px rgba(6, 182, 212, 0.5), 0 0 20px rgba(6, 182, 212, 0.3); }
+        .neon-button { transition: all 0.3s ease; box-shadow: 0 0 5px #06b6d4, 0 0 20px #06b6d4 inset; }
+        .neon-button:hover { background-color: #06b6d4; color: #020617; box-shadow: 0 0 15px #06b6d4, 0 0 40px #06b6d4; }
+        #menu-toggle:checked ~ .navbar { display: flex; }
+        @media (max-width: 1024px) {
+            .navbar { display: none; flex-direction: column; position: absolute; top: 4rem; left: 0; width: 100%; background: rgba(2, 6, 23, 0.98); padding: 2rem 0; border-bottom: 1px solid #1e293b; }
+        }
+        .lang-btn { opacity: 0.5; transition: opacity 0.3s; }
+        .lang-btn.active { opacity: 1; filter: drop-shadow(0 0 5px rgba(6, 182, 212, 0.8)); }
+    </style>
+</head>
+<body class="bg-primary text-white font-sans overflow-x-hidden">
+
+    <div id="dynamic-bg" class="inner-page-bg"></div>
+
+    <!-- NAVIGATION -->
+    <header class="fixed top-0 left-0 w-full bg-primary/90 backdrop-blur-xl z-50 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-3 items-center h-16 md:h-20">
+            <!-- Logo (Gauche) -->
+            <div class="flex justify-start">
+                <a href="#" onclick="showPage('accueil')" class="text-2xl font-black text-cyan-400 uppercase tracking-tighter hover:scale-105 transition-transform">
+                    DJ <span class="text-white">Titou</span>
+                </a>
+            </div>
+
+            <!-- Navigation Centrée (Milieu) -->
+            <nav class="navbar hidden lg:flex justify-center space-x-8 items-center">
+                <a href="#" onclick="showPage('accueil')" data-key="nav-home" class="nav-link py-3 lg:py-0 text-xs font-bold uppercase tracking-widest hover:text-cyan-400 transition cursor-pointer">Accueil</a>
+                <a href="#" onclick="showPage('mixes')" data-key="nav-mixes" class="nav-link py-3 lg:py-0 text-xs font-bold uppercase tracking-widest hover:text-cyan-400 transition cursor-pointer">Mixes</a>
+                <a href="#" onclick="showPage('dates')" data-key="nav-dates" class="nav-link py-3 lg:py-0 text-xs font-bold uppercase tracking-widest hover:text-cyan-400 transition cursor-pointer">Dates</a>
+                <a href="#" onclick="showPage('shop')" data-key="nav-shop" class="nav-link py-3 lg:py-0 text-xs font-bold uppercase tracking-widest hover:text-cyan-400 transition cursor-pointer">Shop</a>
+                <a href="#" onclick="showPage('bio')" data-key="nav-bio" class="nav-link py-3 lg:py-0 text-xs font-bold uppercase tracking-widest hover:text-cyan-400 transition cursor-pointer">Bio</a>
+                <a href="#" onclick="showPage('contact')" data-key="nav-contact" class="nav-link py-3 lg:py-0 text-xs font-bold uppercase tracking-widest hover:text-cyan-400 transition cursor-pointer">Contact</a>
+            </nav>
+
+            <!-- Réseaux & Langues (Droite) -->
+            <div class="flex justify-end items-center space-x-6">
+                <div class="hidden md:flex items-center space-x-5 border-r border-white/10 pr-5">
+                    <a href="https://www.instagram.com/djtitou_off" target="_blank" class="social-link insta" title="Instagram">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                    <a href="https://soundcloud.com/dj_titou/tracks" target="_blank" class="social-link sc" title="SoundCloud">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M11.53 17.525c0 .245-.038.484-.112.711h9.324c1.791 0 3.258-1.447 3.258-3.23 0-1.782-1.467-3.23-3.258-3.23-.233 0-.462.025-.683.072-.516-2.525-2.766-4.423-5.46-4.423-1.077 0-2.083.303-2.934.826-.201.123-.393.264-.575.421v8.853zm-1.127 0V9.458c-.144.116-.279.245-.403.385v7.682h.403zm-1.209 0V10.63c-.144.17-.279.356-.403.559v6.336h.403zm-1.21 0V11.968c-.144.24-.279.497-.403.771v4.786h.403zm-1.209 0v-4.048c-.144.218-.279.455-.403.71v3.338h.403zm-1.21 0v-2.822c-.144.173-.279.358-.403.553v2.269h.403zm-1.209 0v-2.08c-.144.113-.279.238-.403.376v1.704h.403zm-1.21 0v-1.466c-.144.053-.279.113-.403.181v1.285h.403zm-1.209 0v-.942c-.144.01-.279.026-.403.048v.894h.403zm-1.21 0v-.855c-.144.015-.279.034-.403.056v.799h.403z"/></svg>
+                    </a>
+                    <a href="https://www.youtube.com/@DJ_Titou/featured" target="_blank" class="social-link yt" title="YouTube">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                    </a>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="changeLanguage('fr')" id="btn-fr" class="lang-btn active"><span class="text-xl">🇫🇷</span></button>
+                    <button onclick="changeLanguage('en')" id="btn-en" class="lang-btn"><span class="text-xl">🇬🇧</span></button>
+                </div>
+                <input type="checkbox" id="menu-toggle" class="hidden">
+                <label for="menu-toggle" class="lg:hidden cursor-pointer text-cyan-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <!-- PAGE 1 : ACCUEIL -->
+    <section id="accueil" class="page-content page-active relative flex items-center justify-center text-center">
+        <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover">
+            <source src="FOND SITE.mp4" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-primary"></div>
+        <div class="relative z-10 px-6">
+            <div onclick="showPage('dates')" class="inline-flex items-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 mb-6 cursor-pointer hover:bg-white/20 transition group">
+                <span class="flex h-2 w-2 rounded-full bg-cyan-400 mr-3 animate-pulse"></span>
+                <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest">
+                    <span data-key="hero-live">Prochain Live :</span> <span class="text-cyan-400">21 <span data-key="label-june-full">JUIN</span></span> - Montauban
+                </p>
+                <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </div>
+            <p data-key="hero-tagline" class="text-cyan-400 font-medium uppercase tracking-[0.4em] mb-4 text-xs md:text-sm">Le son à l'état pur</p>
+            <h1 class="text-7xl md:text-[10rem] font-black mb-8 uppercase leading-none italic neon-text">DJ <span class="text-cyan-400">TITOU</span></h1>
+            
+            <!-- BOUTONS ACTIONS ACCUEIL -->
+            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center items-center">
+                <button onclick="showPage('mixes')" data-key="btn-listen" class="w-64 py-5 border border-cyan-400/50 text-cyan-400 font-bold rounded-full uppercase tracking-widest neon-button transform transition active:scale-95">Écouter les Mixes</button>
+                <button onclick="showPage('dates')" data-key="btn-dates" class="w-64 py-5 bg-white text-black font-bold rounded-full uppercase tracking-widest hover:bg-cyan-400 transition transform active:scale-95">Voir les dates</button>
+                <button onclick="showPage('shop')" data-key="btn-shop-home" class="w-64 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold rounded-full uppercase tracking-widest hover:bg-white/20 transition transform active:scale-95">Accéder au Shop</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE 2 : MIXES -->
+    <section id="mixes" class="page-content pt-32 pb-20 px-6 max-w-7xl mx-auto">
+        <div class="mb-16">
+            <h2 class="text-5xl md:text-7xl font-black uppercase italic text-white mb-4"><span data-key="mix-title-1">Dernières</span> <span class="text-cyan-400" data-key="mix-title-2">Sorties</span></h2>
+            <div class="h-1 w-20 bg-cyan-400"></div>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+
+            <!-- Mix 1: GMK X Na Za -->
+            <a href="https://www.youtube.com/watch?v=X2SX4GOlN4A" target="_blank" class="group bg-white/5 p-4 rounded-3xl border border-white/10 hover:border-cyan-400 transition-all duration-500 block">
+                <div class="relative aspect-video rounded-2xl overflow-hidden mb-6">
+                    <img src="GMK X Na Za Désolé.avif" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="w-16 h-16 bg-cyan-400 rounded-full flex items-center justify-center text-primary"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-2 group-hover:text-cyan-400 transition" data-key="mix-name-1">GMK X Na Za - Désolé Remix exclusif DJ Titou</h3>
+                <p class="text-gray-400 text-sm mb-4" data-key="mix-genre-1">RAP FR</p>
+                <div class="text-[10px] text-cyan-400 font-bold uppercase"><span data-key="label-min-1">3:57 min</span> • 128 BPM</div>
+            </a>
+
+            <!-- Mix 2: Aya Nakamura X Hamza -->
+            <a href="https://youtu.be/YKQ-UPI0TuY" target="_blank" class="group bg-white/5 p-4 rounded-3xl border border-white/10 hover:border-cyan-400 transition-all duration-500 block">
+                <div class="relative aspect-video rounded-2xl overflow-hidden mb-6">
+                    <img src="GMK X Na Za Désolé.avif" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="w-16 h-16 bg-cyan-400 rounded-full flex items-center justify-center text-primary"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-2 group-hover:text-cyan-400 transition" data-key="mix-name-2">Aya Nakamura NO STRESS X Rnboi MON BEBE X Hamza KYKY2BONDY (DJ Titou Remix)</h3>
+                <p class="text-gray-400 text-sm mb-4" data-key="mix-genre-2">Bouyon Remix Special</p>
+                <div class="text-[10px] text-cyan-400 font-bold uppercase"><span data-key="label-min-2">5:29 min</span> • 128 BPM</div>
+            </a>  
+
+            <!-- Mix 3: Hamza X Daft Punk -->
+            <a href="https://youtu.be/GR_GscniGps" target="_blank" class="group bg-white/5 p-4 rounded-3xl border border-white/10 hover:border-cyan-400 transition-all duration-500 block">
+                <div class="relative aspect-video rounded-2xl overflow-hidden mb-6">
+                    <img src="Hamza Ft. Aya Nakamura X Daft Punk.avif" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="w-16 h-16 bg-cyan-400 rounded-full flex items-center justify-center text-primary"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-2 group-hover:text-cyan-400 transition" data-key="mix-name-3">Hamza ft. Aya Nakamura X Daft Punk - Dale X I Feel It Coming (DJ Titou Remix)</h3>
+                <p class="text-gray-400 text-sm mb-4" data-key="mix-genre-3">Dance et House</p>
+                <div class="text-[10px] text-cyan-400 font-bold uppercase"><span data-key="label-min-3">4:48 min</span> • 128 BPM</div>
+            </a>
+
+            <!-- Mix 4: Franglish -->
+            <a href="https://youtu.be/jrfqiLxUKl8" target="_blank" class="group bg-white/5 p-4 rounded-3xl border border-white/10 hover:border-cyan-400 transition-all duration-500 block">
+                <div class="relative aspect-video rounded-2xl overflow-hidden mb-6">
+                    <img src="Franglish - Solide.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="w-16 h-16 bg-cyan-400 rounded-full flex items-center justify-center text-primary"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-2 group-hover:text-cyan-400 transition" data-key="mix-name-4">Franglish - Solide (DJ Titou Remix)</h3>
+                <p class="text-gray-400 text-sm mb-4" data-key="mix-genre-4">RAP FR</p>
+                <div class="text-[10px] text-cyan-400 font-bold uppercase"><span data-key="label-min-4">1:58 min</span> • 128 BPM</div>
+            </a>
+
+            <!-- Mix 5: Bianca Costa -->
+            <a href="https://youtu.be/Oi29vdibjv4" target="_blank" class="group bg-white/5 p-4 rounded-3xl border border-white/10 hover:border-cyan-400 transition-all duration-500 block">
+                <div class="relative aspect-video rounded-2xl overflow-hidden mb-6">
+                    <img src="Bianca Costa - Ole Ole.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="w-16 h-16 bg-cyan-400 rounded-full flex items-center justify-center text-primary"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-2 group-hover:text-cyan-400 transition" data-key="mix-name-5">Bianca Costa - Olé Olé (DJ Titou Remix)</h3>
+                <p class="text-gray-400 text-sm mb-4" data-key="mix-genre-5">dance</p>
+                <div class="text-[10px] text-cyan-400 font-bold uppercase"><span data-key="label-min-5">3:45 min</span> • 128 BPM</div>
+            </a>
+            
+            <!-- Mix 6: Rihanna -->
+            <a href="https://youtu.be/f69BfZar34o" target="_blank" class="group bg-white/5 p-4 rounded-3xl border border-white/10 hover:border-cyan-400 transition-all duration-500 block">
+                <div class="relative aspect-video rounded-2xl overflow-hidden mb-6">
+                    <img src="Rihanna - Te Amo.webp" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="w-16 h-16 bg-cyan-400 rounded-full flex items-center justify-center text-primary"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-2 group-hover:text-cyan-400 transition" data-key="mix-name-6">Rihanna - Te Amo (DJ Titou Remix)</h3>
+                <p class="text-gray-400 text-sm mb-4" data-key="mix-genre-6">Dance</p>
+                <div class="text-[10px] text-cyan-400 font-bold uppercase"><span data-key="label-min-6">3:22 min</span> • 128 BPM</div>
+            </a>            
+        </div>
+    </section>
+
+    <!-- PAGE 3 : DATES -->
+    <section id="dates" class="page-content pt-32 pb-20 px-6 max-w-5xl mx-auto">
+        <div class="mb-16">
+            <h2 class="text-5xl md:text-7xl font-black uppercase italic text-white mb-4">
+                <span data-key="date-title-1">Prochaines</span> <span class="text-cyan-400" data-key="date-title-2">Dates</span>
+            </h2>
+            <div class="h-1 w-20 bg-cyan-400"></div>
+        </div>
+
+        <!-- JUIN 2026 -->
+        <h3 class="text-2xl font-bold uppercase text-cyan-400 border-b border-white/10 pb-4 mb-8" data-key="month-june">Juin 2026</h3>
+        <div class="space-y-6 mb-12">
+            <div class="flex flex-col md:flex-row justify-between items-center bg-white/5 backdrop-blur-sm p-6 rounded-3xl border border-white/10 hover:border-cyan-400/30 transition-all duration-300">
+                <div class="flex items-center space-x-6 mb-4 md:mb-0 text-left w-full">
+                    <div class="text-center min-w-[60px]">
+                        <p class="text-4xl font-black text-cyan-400 leading-none">21</p>
+                        <p class="text-xs font-bold uppercase text-white tracking-widest" data-key="label-june">Juin</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-black text-white uppercase italic" data-key="event-fete">Fête de la Musique</h3>
+                        <p class="text-gray-400 text-sm">Montauban | House, Rap fr & Shatta | 19:00</p>
+                    </div>
+                </div>
+                <a href="https://shotgun.live/fr" target="_blank" data-key="btn-tickets" class="w-full md:w-auto text-center px-8 py-3 bg-cyan-400 text-primary font-bold rounded-full hover:scale-105 transition duration-300 shadow-[0_0_20px_rgba(6,182,212,0.3)]">BILLETTERIE</a>
+            </div>
+        </div>
+
+        <!-- JUILLET 2026 -->
+        <h3 class="text-2xl font-bold uppercase text-cyan-400 border-b border-white/10 pb-4 mb-8 mt-16" data-key="month-july">Juillet 2026</h3>
+        <div class="space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-center bg-white/5 backdrop-blur-sm p-6 rounded-3xl border border-white/10 hover:border-cyan-400/30 transition-all duration-300">
+                <div class="flex items-center space-x-6 mb-4 md:mb-0 text-left w-full">
+                    <div class="text-center min-w-[60px]">
+                        <p class="text-4xl font-black text-cyan-400 leading-none">03</p>
+                        <p class="text-xs font-bold uppercase text-white tracking-widest" data-key="label-july">Juill.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-black text-white uppercase italic">Le Bikini</h3>
+                        <p class="text-gray-400 text-sm">Toulouse | Rap fr & Shatta | 23:00</p>
+                    </div>
+                </div>
+                <a href="https://shotgun.live/fr" target="_blank" data-key="btn-tickets" class="w-full md:w-auto text-center px-8 py-3 bg-cyan-400 text-primary font-bold rounded-full hover:scale-105 transition duration-300 shadow-[0_0_20px_rgba(6,182,212,0.3)]">BILLETTERIE</a>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center bg-white/5 backdrop-blur-sm p-6 rounded-3xl border border-white/10 hover:border-cyan-400/30 transition-all duration-300">
+                <div class="flex items-center space-x-6 mb-4 md:mb-0 text-left w-full">
+                    <div class="text-center min-w-[60px]">
+                        <p class="text-4xl font-black text-cyan-400 leading-none">04</p>
+                        <p class="text-xs font-bold uppercase text-white tracking-widest" data-key="label-july">Juill.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-black text-white uppercase italic">O'Club</h3>
+                        <p class="text-gray-400 text-sm">Toulouse | Rap fr & Shatta | 23:00</p>
+                    </div>
+                </div>
+                <a href="https://shotgun.live/fr" target="_blank" data-key="btn-tickets" class="w-full md:w-auto text-center px-8 py-3 bg-cyan-400 text-primary font-bold rounded-full hover:scale-105 transition duration-300 shadow-[0_0_20px_rgba(6,182,212,0.3)]">BILLETTERIE</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE : BIO -->
+    <section id="bio" class="page-content pt-32 pb-20 px-6 max-w-5xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+            <div class="relative">
+                <div class="absolute -top-4 -left-4 w-full h-full border-2 border-cyan-400 rounded-3xl"></div>
+                <img src="LOGO MOI.jpg" class="relative z-10 rounded-3xl grayscale hover:grayscale-0 transition-all duration-700">
+            </div>
+            <div>
+                <h2 class="text-6xl font-black uppercase italic mb-8">Bio<span class="text-cyan-400">graphie</span></h2>
+                <div class="space-y-6 text-gray-400 leading-relaxed text-lg">
+                    <p>Originaire de MONTAUBAN, <span class="text-white font-bold">DJ Titou</span>  est rapidement devenu une figure incontournable de la scène électronique et urbaine. Avec une capacité unique à fusionner les genres allant de House, à Urbain/Shatta et à  Techno/Electro, il crée des sets qui sont de véritables voyages auditifs.</p>
+                    <p>Son secret ? Une énergie inépuisable derrière les platines et une sélection musicale pointue qui ne laisse personne indifférent. Que ce soit en festival ou dans des clubs, DJ Titou transforme chaque événement en une expérience collective et euphorique. Suivez le mouvement !</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE : SHOP -->
+    <section id="shop" class="page-content pt-32 pb-20 px-6 max-w-7xl mx-auto">
+        <h2 class="text-5xl md:text-7xl font-black uppercase italic mb-16"><span data-key="shop-title-1">Boutique</span> <span class="text-cyan-400 text-outline" data-key="shop-title-2">Officielle</span></h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div class="bg-white/5 p-6 rounded-3xl border border-white/10 text-center">
+                <div class="aspect-square bg-gray-800 rounded-2xl mb-6 flex items-center justify-center">Merch Item</div>
+                <h3 class="text-xl font-bold mb-2">T-Shirt "Neon Wave"</h3>
+                <p class="text-cyan-400 font-bold mb-4">25.00 €</p>
+                <button data-key="btn-buy" class="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-cyan-400 transition">Acheter</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE : CONTACT -->
+    <section id="contact" class="page-content pt-32 pb-20 px-6 max-w-4xl mx-auto">
+        <h2 class="text-5xl md:text-7xl font-black uppercase italic mb-16"><span data-key="contact-title-1">Me</span> <span class="text-cyan-400 text-outline" data-key="contact-title-2">Contacter</span></h2>
+        <form 
+            action="https://formspree.io/f/xrbnlawr" 
+            method="POST"
+            class="space-y-6"
+        >
+            <div class="grid md:grid-cols-2 gap-6">
+                <input 
+                    type="text" 
+                    name="name"
+                    required
+                    data-placeholder="input-name" 
+                    placeholder="Nom" 
+                    class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 outline-none focus:border-cyan-400 transition text-white"
+                >
+                <input 
+                    type="email" 
+                    name="email"
+                    required
+                    data-placeholder="input-email" 
+                    placeholder="Email" 
+                    class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 outline-none focus:border-cyan-400 transition text-white"
+                >
+            </div>
+            <textarea 
+                name="message"
+                required
+                data-placeholder="input-msg" 
+                placeholder="Votre message" 
+                rows="6" 
+                class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 outline-none focus:border-cyan-400 transition text-white"
+            ></textarea>
+            
+            <button 
+                type="submit" 
+                data-key="btn-send" 
+                class="px-12 py-4 bg-cyan-400 text-black font-bold rounded-full uppercase tracking-widest hover:bg-white transition cursor-pointer"
+            >
+                Envoyer
+            </button>
+        </form>
+    </section>
+    
+    <!-- Pied de Page -->
+    <footer class="w-full py-12 px-6 border-t border-white/5 text-center">
+        <div class="max-w-3xl mx-auto flex flex-col items-center opacity-40 hover:opacity-100 transition-opacity duration-500">
+            <p class="text-[10px] uppercase tracking-[0.3em] mb-6">
+                © 2026 DJ TITOU. <span data-key="footer-rights">Tous droits réservés.</span>
+            </p>
+            <div class="flex justify-center space-x-8">
+                <a href="#" onclick="showPage('accueil')" class="text-[9px] uppercase tracking-widest hover:text-cyan-400 transition">Credits</a>
+                <a href="#" class="text-[9px] uppercase tracking-widest hover:text-cyan-400 transition">Privacy</a>
+                <a href="#" class="text-[9px] uppercase tracking-widest hover:text-cyan-400 transition">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const translations = {
+            fr: {
+                "nav-home": "Accueil", "nav-mixes": "Mixes", "nav-dates": "Dates", "nav-shop": "Shop", "nav-bio": "Bio", "nav-contact": "Contact",
+                "hero-live": "Prochain Live :", "hero-tagline": "Le son à l'état pur", 
+                "btn-listen": "Écouter les Mixes", "btn-dates": "Voir les dates", "btn-shop-home": "Accéder au Shop",
+                "mix-title-1": "Dernières", "mix-title-2": "Sorties", 
+                "mix-name-1": "GMK X Na Za - Désolé Remix exclusif DJ Titou", "mix-genre-1": "RAP FR", "label-min-1": "3:57 min",
+                "mix-name-2": "Aya Nakamura NO STRESS X Rnboi MON BEBE X Hamza KYKY2BONDY (DJ Titou Remix)", "mix-genre-2": "Bouyon Remix Spécial", "label-min-2": "5:29 min",
+                "mix-name-3": "Hamza ft. Aya Nakamura X Daft Punk - Dale X I Feel It Coming (DJ Titou Remix)", "mix-genre-3": "Dance et House", "label-min-3": "4:48 min",
+                "date-title-1": "Prochaines", "date-title-2": "Dates",
+                "month-june": "Juin 2026", "month-july": "Juillet 2026", "label-june": "Juin", "label-july": "Juill.", "label-june-full": "JUIN",
+                "event-fete": "Fête de la Musique", "btn-tickets": "BILLETTERIE",
+                "bio-suffix": "graphie", "bio-text": "Passionné par les sons électroniques depuis son plus jeune âge, DJ Titou s'est imposé sur la scène underground grâce à son style unique mélangeant Deep House et Techno minimale.",
+                "shop-title-1": "Boutique", "shop-title-2": "Officielle", "btn-buy": "Acheter", "contact-title-1": "Me", "contact-title-2": "Contacter",
+                "input-name": "Nom", "input-email": "Email", "input-msg": "Votre message", "btn-send": "Envoyer"
+            },
+            en: {
+                "nav-home": "Home", "nav-mixes": "Mixes", "nav-dates": "Dates", "nav-shop": "Shop", "nav-bio": "Bio", "nav-contact": "Contact",
+                "hero-live": "Next Live:", "hero-tagline": "Pure Sound Experience", 
+                "btn-listen": "Listen to Mixes", "btn-dates": "View Dates", "btn-shop-home": "Shop",
+                "mix-title-1": "Latest", "mix-title-2": "Drops", 
+                "mix-name-1": "GMK X Na Za - Désolé exclusive DJ Titou Remix", "mix-genre-1": "FRENCH RAP", "label-min-1": "3:57 min",
+                "mix-name-2": "Aya Nakamura NO STRESS X Rnboi MON BEBE X Hamza KYKY2BONDY (DJ Titou Remix)", "mix-genre-2": "Special Bouyon Remix", "label-min-2": "5:29 min",
+                "mix-name-3": "Hamza ft. Aya Nakamura X Daft Punk - Dale X I Feel It Coming (DJ Titou Remix)", "mix-genre-3": "Dance & House", "label-min-3": "4:48 min",
+                "date-title-1": "Upcoming", "date-title-2": "Dates",
+                "month-june": "June 2026", "month-july": "July 2026", "label-june": "June", "label-july": "July", "label-june-full": "JUNE",
+                "event-fete": "Music Festival", "btn-tickets": "TICKETS",
+                "bio-suffix": "graphy", "bio-text": "Passionate about electronic sounds from a young age, DJ Titou has established himself on the underground scene with his unique style blending Deep House and minimal Techno.",
+                "shop-title-1": "Official", "shop-title-2": "Merch", "btn-buy": "Buy Now", "contact-title-1": "Get in", "contact-title-2": "Touch",
+                "input-name": "Name", "input-email": "Email", "input-msg": "Your message", "btn-send": "Send Message"
+            }
+        };
+
+        function changeLanguage(lang) {
+            document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[lang][key]) el.innerText = translations[lang][key];
+            });
+            document.querySelectorAll('[data-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-placeholder');
+                if (translations[lang][key]) el.placeholder = translations[lang][key];
+            });
+            document.documentElement.lang = lang;
+        }
+
+        function showPage(pageId) {
+            const currentPage = document.querySelector('.page-active');
+            const targetPage = document.getElementById(pageId);
+            const dynamicBg = document.getElementById('dynamic-bg');
+            if (!targetPage || currentPage === targetPage) return;
+            if (pageId === 'accueil') dynamicBg.classList.remove('bg-visible');
+            else dynamicBg.classList.add('bg-visible');
+            if (currentPage) {
+                currentPage.classList.add('page-exit');
+                setTimeout(() => {
+                    currentPage.classList.remove('page-active', 'page-exit');
+                    targetPage.classList.add('page-active');
+                    window.scrollTo(0, 0);
+                }, 400);
+            } else targetPage.classList.add('page-active');
+            document.getElementById('menu-toggle').checked = false;
+        }
+
+        window.onload = () => showPage('accueil');
+    </script>
+</body>
+</html>
