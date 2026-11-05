@@ -83,8 +83,17 @@
                         <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                     </a>
                 </div>
+                <div class="relative">
+                    <button type="button" onclick="toggleSearch()" aria-label="Ouvrir la recherche" title="Rechercher" class="text-cyan-400 hover:text-white transition p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"></circle><path d="m20 20-4-4" stroke-width="2" stroke-linecap="round"></path></svg>
+                    </button>
+                    <div id="site-search-panel" class="hidden absolute right-0 top-12 w-72 md:w-80 bg-slate-950 border border-cyan-400/40 rounded-2xl p-3 shadow-2xl">
+                        <input id="site-search-input" type="search" placeholder="Rechercher sur le site..." autocomplete="off" oninput="searchSite(this.value)" onkeydown="if(event.key==='Escape') toggleSearch(false)" class="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-cyan-400">
+                        <div id="site-search-results" class="mt-2 max-h-72 overflow-y-auto text-left"></div>
+                    </div>
+                </div>
                 <div class="flex space-x-3">
-                    <button onclick="changeLanguage('fr')" id="btn-fr" class="lang-btn active"><span class="text-xl">🇫🇷</span></button>
+                    <button onclick="changeLanguage('fr') id="btn-fr" class="lang-btn active"><span class="text-xl">🇫🇷</span></button>
                     <button onclick="changeLanguage('en')" id="btn-en" class="lang-btn"><span class="text-xl">🇬🇧</span></button>
                 </div>
                 <input type="checkbox" id="menu-toggle" class="hidden">
@@ -403,6 +412,80 @@
                 if (translations[lang][key]) el.placeholder = translations[lang][key];
             });
             document.documentElement.lang = lang;
+        }
+
+        function toggleSearch(forceOpen) {
+            const panel = document.getElementById('site-search-panel');
+            const input = document.getElementById('site-search-input');
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : panel.classList.contains('hidden');
+            panel.classList.toggle('hidden', !shouldOpen);
+            if (shouldOpen) setTimeout(() => input.focus(), 50);
+            else {
+                input.value = '';
+                document.getElementById('site-search-results').innerHTML = '';
+            }
+        }
+
+        function searchSite(value) {
+            const results = document.getElementById('site-search-results');
+            const query = value.trim().toLocaleLowerCase('fr');
+            results.innerHTML = '';
+            if (!query) return;
+
+            const pages = [
+                { id: 'accueil', title: 'Accueil' },
+                { id: 'mixes', title: 'Mixes' },
+                { id: 'dates', title: 'Dates' },
+                { id: 'shop', title: 'Shop' },
+                { id: 'bio', title: 'Bio' },
+                { id: 'contact', title: 'Contact' }
+            ];
+            const matches = [];
+            pages.forEach(page => {
+                const section = document.getElementById(page.id);
+                if (section && section.innerText.toLocaleLowerCase('fr').includes(query)) {
+                    matches.push({ page: page.id, title: page.title, detail: 'Page du site', target: page.id });
+                }
+            });
+
+            document.querySelectorAll('#mixes a, #dates .space-y-6 > div, #shop .grid > div').forEach((item, index) => {
+                const text = item.innerText.trim();
+                if (text.toLocaleLowerCase('fr').includes(query)) {
+                    const page = item.closest('section').id;
+                    const target = 'search-result-' + page + '-' + index;
+                    if (!item.id) item.id = target;
+                    matches.push({ page, title: text.split('\\n').filter(Boolean)[0].slice(0, 65), detail: page === 'mixes' ? 'Mix' : page === 'dates' ? 'Date' : 'Boutique', target: item.id });
+                }
+            });
+
+            if (!matches.length) {
+                const empty = document.createElement('p');
+                empty.className = 'text-sm text-gray-400 px-2 py-3';
+                empty.textContent = 'Aucun résultat trouvé.';
+                results.appendChild(empty);
+                return;
+            }
+            matches.slice(0, 8).forEach(match => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'block w-full text-left px-3 py-2 rounded-lg hover:bg-cyan-400/10 transition';
+                const title = document.createElement('span');
+                title.className = 'block text-sm font-bold text-white';
+                title.textContent = match.title;
+                const detail = document.createElement('span');
+                detail.className = 'block text-xs text-cyan-400';
+                detail.textContent = match.detail;
+                button.append(title, detail);
+                button.addEventListener('click', () => {
+                    showPage(match.page);
+                    toggleSearch(false);
+                    setTimeout(() => {
+                        const target = document.getElementById(match.target);
+                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 450);
+                });
+                results.appendChild(button);
+            });
         }
 
         function showPage(pageId) {
